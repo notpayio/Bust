@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix='.', intents=intents)
 token = os.getenv("TOKEN")
 api = os.getenv("API_KEY")
 ref = os.getenv("REF_ID")
-authorized_members = os.getenv("AUTHORIZED_MEMBER")
+authorized_members = [int(member_id) for member_id in os.getenv("AUTHORIZED_MEMBER", "").split(",")]
 id = None
 number = None
 
