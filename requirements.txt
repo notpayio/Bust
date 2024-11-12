@@ -2,4 +2,4 @@ nextcord
 discord.py
 colorama
 requests
-
+flask
