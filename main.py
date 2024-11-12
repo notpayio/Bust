@@ -2,9 +2,10 @@ import discord
 import json
 import requests
 from discord.ext import commands
-import colorama 
+import colorama
 from colorama import Fore, Style
 import os
+from flask import Flask
 
 with open('countries.json', 'r') as file:
     countries = json.load(file)
@@ -13,7 +14,7 @@ with open('services.json', 'r') as file:
     services = json.load(file)
 
 intents = discord.Intents.default()
-intents.message_content = True  
+intents.message_content = True
 bot = commands.Bot(command_prefix='.', intents=intents)
 token = os.getenv("TOKEN")
 api = os.getenv("API_KEY")
@@ -22,7 +23,11 @@ authorized_members = os.getenv("AUTHORIZED_MEMBER")
 id = None
 number = None
 
+app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "Discord bot is running!"
 
 def is_authorized(ctx):
     return ctx.author.id in authorized_members
@@ -30,7 +35,7 @@ def is_authorized(ctx):
 async def check_balance():
     balance_url = f"https://api.tiger-sms.com/stubs/handler_api.php?api_key={api}&action=getBalance"
     response = requests.get(balance_url)
-    balance = response.text.split(":")[1].strip()  
+    balance = response.text.split(":")[1].strip()
     balance_value = float(balance)
     if 'BAD_KEY' in response.text:
         return "❌ Invalid API Key"
@@ -163,4 +168,14 @@ async def price(ctx, service_name: str, country_name: str):
     result = await get_price_for_service_and_country(service_name, country_name)
     await ctx.send(f":green_circle: Found Results \n {presponse.text}")
 
-bot.run(token)
+if __name__ == "__main__":
+    from threading import Thread
+    
+    def run_flask():
+        port = int(os.getenv("PORT", 5000))
+        app.run(host="0.0.0.0", port=port)
+    
+    flask_thread = Thread(target=run_flask)
+    flask_thread.start()
+
+    bot.run(token)
