@@ -6,9 +6,6 @@ import colorama
 from colorama import Fore, Style
 import os
 
-with open('config.json', 'r') as config_file:
-    config = json.load(config_file)
-
 with open('countries.json', 'r') as file:
     countries = json.load(file)
 
